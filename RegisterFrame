@@ -1,0 +1,150 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+public class RegisterFrame extends JFrame{
+	//constant variable
+	private static final int FRAME_WIDTH = 500;
+	private static final int FRAME_HEIGHT = 300;
+	private static final int FIELD_WIDTH = 10; //TextField
+	private static final int COLUMN = 40; //TextArea
+	
+	private final Register register; //訪問已註冊的學生和課程信息，並將學生與課程聯繫起來
+	private JPanel panel; //the top panel stores all JPanel
+	private JPanel stuPanel; //the panel stores components related to students
+	private JPanel courPanel; //the panel stores components related to courses
+	private JPanel butPanel; //the panel stores both enroll and drop button
+	private JLabel studentIDLabel; //the label of the student ID
+	private JLabel courseIDLabel; //the label of the course ID
+	private JTextField studentIDField; //the text field for user to enter the student ID
+	private JTextField courseIDField; //the text field for user to enter the course ID
+	private JButton studentInfoButton; //the button to trigger the action to show the student information
+	private JButton courseInfoButton; //the button to trigger the action to show the course information
+	private JButton enrollButton; //the button to enroll the course for the students
+	private JButton dropButton; //the button to drop the course for the students
+	private JTextArea resultArea; //the text area to present the result of the output
+	
+	public RegisterFrame() {
+		//enable to constructs a RegisterFrame object
+		
+		
+		register = new Register();
+		register.addCourse("306050001","OOPI",2);
+		register.addCourse("306050021","ICS",2); 
+		register.addCourse("301303999","Intern",3);
+		register.addStudent("109356001","A");
+		register.addStudent("109356010","B");
+		
+		setTitle("Course Register");
+		setSize(FRAME_WIDTH,FRAME_HEIGHT);
+		
+		createPanel();
+	}
+	
+	public void createStudentIDComp() {
+		studentIDLabel = new JLabel("Student ID:");
+		studentIDField = new JTextField(FIELD_WIDTH);
+		studentInfoButton = new JButton("Student INFO");
+		
+		courPanel = new JPanel();
+		courPanel.add(studentIDLabel);
+		courPanel.add(studentIDField);
+		courPanel.add(studentInfoButton);
+		
+		//inner class
+		class ButtonListener implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+				if(register.findStudent(studentIDField.getText()) != null) {
+					resultArea.setText(register.findStudent(studentIDField.getText()).getInfo());
+				} else {
+					resultArea.setText("Cannot find the student");
+				}
+			}
+		}
+		ActionListener button = new ButtonListener();
+		studentInfoButton.addActionListener(button);
+	}
+	public void createCourseIDComp() {
+		courseIDLabel = new JLabel("Course ID:");
+		courseIDField = new JTextField(FIELD_WIDTH);
+		courseInfoButton = new JButton("Course INFO");
+		
+		stuPanel = new JPanel();
+		stuPanel.add(courseIDLabel);
+		stuPanel.add(courseIDField);
+		stuPanel.add(courseInfoButton);
+		
+		class ButtonListener implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+				if(register.findCourse(courseIDField.getText()) != null) {
+					resultArea.setText(register.findCourse(courseIDField.getText()).getInfo());
+				} else {
+					resultArea.setText("Cannot find the course");
+				}
+			}
+		}
+		ActionListener button = new ButtonListener();
+		courseInfoButton.addActionListener(button);
+	}
+	public void createEnrollBtn() {
+		enrollButton = new JButton("Enroll");
+		
+		class ButtonListener implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+				if(register.enrollCourse(studentIDField.getText(),courseIDField.getText()) == true) {
+					resultArea.setText(studentIDField.getText()+" enrolled in "+courseIDField.getText());
+				} else {
+					resultArea.setText("Error");
+				}
+			}
+		}
+		ActionListener button = new ButtonListener();
+		enrollButton.addActionListener(button);
+	}
+	public void createDropBtn() {
+		dropButton = new JButton("Drop");
+		
+		class ButtonListener implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+				if(register.dropCourse(studentIDField.getText(),courseIDField.getText()) == true) {
+					resultArea.setText(studentIDField.getText()+" dropped out of "+courseIDField.getText());
+				} else {
+					resultArea.setText("Error");
+				}
+			}
+		}
+		ActionListener button = new ButtonListener();
+		dropButton.addActionListener(button);
+	}
+	public void createPanel() { 
+		panel = new JPanel();
+		resultArea = new JTextArea(FRAME_HEIGHT,COLUMN);
+		resultArea.setLineWrap(true);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.add(resultArea);
+		
+		createStudentIDComp();
+		createCourseIDComp();
+		createEnrollBtn();
+		createDropBtn();
+		
+		butPanel = new JPanel();
+		butPanel.add(enrollButton);
+		butPanel.add(dropButton);
+		
+		panel.add(courPanel);
+		panel.add(butPanel);
+		panel.add(stuPanel);
+		panel.add(butPanel);
+		panel.add(resultArea);
+		//panel.add(scrollPane);
+		add(panel);
+	}
+}
